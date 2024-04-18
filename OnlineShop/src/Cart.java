@@ -39,7 +39,7 @@ public class Cart extends javax.swing.JFrame {
         
 
     public Cart() {      
-        super("Product Page");
+        super("cart Page");
         initComponents();
         initComponents2();
         
