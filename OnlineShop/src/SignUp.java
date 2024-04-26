@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.sql.*;
+import java.security.MessageDigest;
+
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
@@ -66,6 +68,27 @@ public class SignUp extends javax.swing.JFrame {
     /**
      * Creates new form SignUpOrlogIn
      */
+    
+    public static String generateSHA256(String input) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(input.getBytes());
+            StringBuilder hexString = new StringBuilder();
+
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) {
+                    hexString.append('0');
+                }
+                hexString.append(hex);
+            }
+
+            return hexString.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
     public String role = "c";
     public SignUp() {
         initComponents();
@@ -310,7 +333,7 @@ public class SignUp extends javax.swing.JFrame {
 
         jLabel11.setText("shipping address");
 
-        jTextField8.setText("country-city-ni");
+        jTextField8.setText("country-city-district-street");
         jTextField8.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jTextField8ActionPerformed(evt);
@@ -424,7 +447,7 @@ public class SignUp extends javax.swing.JFrame {
             if(evt.getSource() == jButton1){
                 Query ins = new Query();
                 res = ins.insert(jTextField6.getText(),jTextField7.getText(),role,jTextField1.getText(),jTextField4.getText(),jTextField8.getText()
-                        ,jTextField2.getText());
+                        ,generateSHA256(jTextField2.getText()));
 
                 if(res>0){
                     JOptionPane.showMessageDialog(null, "you are regsterd!","DONE!",JOptionPane.INFORMATION_MESSAGE);
