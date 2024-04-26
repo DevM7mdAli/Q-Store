@@ -1,74 +1,65 @@
-create database shop;
-use shop;
-
--- Roles will be ethier s for seller or c for customer
-create table users(
-ID INT primary key auto_increment,
-First_Name varchar(40) not null,
-Last_name varchar(40) not null,
-roles char(1) not null,
-userName varchar(30) unique not null,
-age date not null,
-shipping_info text not null
+CREATE TABLE users (
+    ID INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    First_Name VARCHAR(40) NOT NULL,
+    Last_name VARCHAR(40) NOT NULL,
+    roles CHAR(1) NOT NULL,
+    userName VARCHAR(30) UNIQUE NOT NULL,
+    age DATE NOT NULL,
+    shipping_info CLOB NOT NULL, -- Changed to CLOB for long text
+    password CLOB NOT NULL -- Changed to CLOB for long text, added password column
 );
 
-alter table users
-add constraint rolescons check(roles = 's' or roles = 'c'); 
+-- Added constraint for roles
+ALTER TABLE users
+ADD CONSTRAINT rolescons CHECK(roles = 's' OR roles = 'c');
 
 CREATE TABLE cart (
-    ID INT PRIMARY KEY AUTO_INCREMENT,
+    ID INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     total DECIMAL(10, 2) NOT NULL,
     user_id INT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(ID)
 );
 
-alter table cart
-add constraint totalcons check(total>0.00);
+-- Added constraint for total
+ALTER TABLE cart
+ADD CONSTRAINT totalcons CHECK(total > 0.00);
 
-create table orders(
-ID int primary key auto_increment,
-price decimal(10,2) not null,
-odate date default(CURRENT_TIMESTAMP),
-user_id int not null,
-foreign key (user_id) references users(ID)
+CREATE TABLE orders (
+    ID INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    price DECIMAL(10, 2) NOT NULL,
+    odate DATE DEFAULT CURRENT_TIMESTAMP,
+    user_id INT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(ID)
 );
 
-alter table orders
-add constraint opricecons check(price>0.00);
+-- Added constraint for price
+ALTER TABLE orders
+ADD CONSTRAINT opricecons CHECK(price > 0.00);
 
-create table product(
-ID int primary key,
-p_name varchar(70) not null,
-price decimal(10,2) not null,
-Manfacturer varchar(50),
-seller int not null,
-foreign key(seller) references users(ID)
+CREATE TABLE product (
+    ID INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY, -- Changed position of GENERATED ALWAYS
+    p_name VARCHAR(70) NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    Manufacturer VARCHAR(50), -- Corrected spelling of 'Manufacturer'
+    seller INT NOT NULL,
+    FOREIGN KEY (seller) REFERENCES users(ID)
 );
 
-alter table product
-add constraint ppricecons check(price>0.00);
+-- Added constraint for price
+ALTER TABLE product
+ADD CONSTRAINT ppricecons CHECK(price > 0.00);
 
--- many to many
-create table cart_products(
-ID int primary key auto_increment,
-cart int,
-product int,
-foreign key(cart) references cart(ID),
-foreign key(product) references product(ID)
+CREATE TABLE cart_products (
+    ID INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    cart INT,
+    product INT,
+    FOREIGN KEY (cart) REFERENCES cart(ID),
+    FOREIGN KEY (product) REFERENCES product(ID)
 );
 
-alter table product
-modify ID int auto_increment;
-
--- many to many
-create table Order_Product(
-order_id int not null,
-product int not null,
-foreign key (product) references product(ID),
-foreign key(order_id) references orders(ID)
+CREATE TABLE Order_Product (
+    order_id INT NOT NULL,
+    product INT NOT NULL,
+    FOREIGN KEY (product) REFERENCES product(ID),
+    FOREIGN KEY (order_id) REFERENCES orders(ID)
 );
-
-
-alter table users 
-add column password text not null;
-

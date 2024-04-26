@@ -1,3 +1,6 @@
+import javax.swing.*;
+import java.sql.*;
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
@@ -7,11 +10,63 @@
  *
  * @author XHBNH
  */
+
+class Query{
+        static final String URL = "jdbc:derby:oshop";
+        static final String USERNAME = "app";
+        
+        static  final String PASSWORD = "";
+        static Connection connect;
+    
+        PreparedStatement inserta;
+        
+        Query(){
+             try{
+            connect = DriverManager.getConnection(URL,USERNAME,PASSWORD);
+            inserta = connect.prepareStatement("insert into users(First_Name,Last_name,roles,userName,age,shipping_info,password)values(?,?,?,?,?,?,?)" );
+            }catch(Exception e){
+                e.printStackTrace();
+                System.exit(1);
+            }
+        }
+        
+        int result = 0;
+        int insert(String fname,String Lname,String role,String usersSame,String age,String sh_info,String pass){
+             try{
+             inserta.setString(1, fname);
+             inserta.setString(2, Lname);
+             
+             inserta.setString(3, role);
+             inserta.setString(4, usersSame);
+             
+             inserta.setString(5, age);
+             inserta.setString(6, sh_info);
+             
+             inserta.setString(7, pass);
+             result = inserta.executeUpdate();
+            }catch(Exception e2){
+                 e2.printStackTrace();
+                 close();
+                 
+             }
+             return result;
+            }
+        
+        static void close(){
+            try{
+                  connect.close();
+            }catch(Exception err)   {
+                System.out.println("connection dose not want to close");
+            }
+        }
+    }
+
 public class SignUp extends javax.swing.JFrame {
 
     /**
      * Creates new form SignUpOrlogIn
      */
+    public String role = "c";
     public SignUp() {
         initComponents();
     }
@@ -201,6 +256,11 @@ public class SignUp extends javax.swing.JFrame {
 
         buttonGroup1.add(jRadioButton1);
         jRadioButton1.setText("Customer");
+        jRadioButton1.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                jRadioButton1StateChanged(evt);
+            }
+        });
 
         buttonGroup1.add(jRadioButton2);
         jRadioButton2.setText("Seller");
@@ -233,8 +293,18 @@ public class SignUp extends javax.swing.JFrame {
         );
 
         jButton1.setText("Sign up");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jButton2.setText("Login ");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         jLabel11.setText("shipping address");
 
@@ -331,9 +401,47 @@ public class SignUp extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jTextField1ActionPerformed
 
+    private void jRadioButton1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jRadioButton1StateChanged
+        if(jRadioButton1.isSelected()){
+            role = "c";
+        }else{
+            role = "s";
+        }
+    }//GEN-LAST:event_jRadioButton1StateChanged
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        try{
+            int res = 0;
+            if(evt.getSource() == jButton1){
+                Query ins = new Query();
+                res = ins.insert(jTextField6.getText(),jTextField7.getText(),role,jTextField1.getText(),jTextField4.getText(),jTextField8.getText()
+                        ,jTextField2.getText());
+
+                if(res>0){
+                    JOptionPane.showMessageDialog(null, "you are regsterd!","DONE!",JOptionPane.INFORMATION_MESSAGE);
+                }else{
+                    JOptionPane.showMessageDialog(null, "you may need to choose another name!","ERROR!",JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }catch(Exception er){
+            JOptionPane.showMessageDialog(null, "you may need to choose another Username!","ERROR!",JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        SignIn.caller();
+    }//GEN-LAST:event_jButton2ActionPerformed
+
     /**
      * @param args the command line arguments
      */
+    public static void caller(){
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new SignUp().setVisible(true);
+            }
+        });
+    }
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
