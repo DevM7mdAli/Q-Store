@@ -1,3 +1,7 @@
+import javax.swing.*;
+import java.sql.*;
+import java.security.MessageDigest;
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
@@ -7,8 +11,151 @@
  *
  * @author XHBNH
  */
-public class SignIn extends javax.swing.JFrame {
+class Users{
+    String UserName;
+    String dob;
+    String Fname;
+    
+    String lname;
+    
+}
 
+class Customer extends Users{
+    String ship_info;
+    String role;
+    
+    public Customer(String uname,String fname,String lname, String ship,String age) {
+        super.UserName = uname;
+        super.Fname = fname;
+        
+        super.lname = lname;
+        this.ship_info = ship;
+        
+        super.dob = age;
+        this.role = "c";
+    }
+    
+    
+}
+
+class Seller extends Users{
+    
+    String role;
+    
+    public Seller(String uname,String fname,String lname,String age) {
+        super.UserName = uname;
+        super.Fname = fname;
+        
+        super.lname = lname;
+       
+        
+        super.dob = age;
+        this.role = "s";
+    }
+    
+    
+}
+
+class Lquery{
+    static final String URL = "jdbc:derby:oshop";
+        static final String USERNAME = "app";
+        
+        static  final String PASSWORD = "";
+        static Connection connect;
+    
+        PreparedStatement login;
+        
+        Lquery(String uname, String passw){
+             try{
+            connect = DriverManager.getConnection(URL,USERNAME,PASSWORD);
+            login = connect.prepareStatement("SELECT * FROM USERS WHERE USERNAME = ? AND PASSWORD_NEW = ?" );
+            }catch(Exception e){
+                e.printStackTrace();
+                System.exit(1);
+            }
+             
+             ResultSet result = null;
+            try{
+                login.setString(1, uname);
+                login.setString(2, generateSHA256(passw));
+                
+                result = login.executeQuery();
+
+                  int rows = 0;
+
+                     while(result.next()){
+                         rows ++;
+                        if(result.getString("UROLE").equals("c")){
+                            
+
+                                SignIn.cust = new Customer(result.getString("USERNAME"), result.getString("FIRST_NAME"),
+                                        result.getString("LAST_NAME"), result.getString("SHIPPING_INFO_NEW"),
+                                        result.getString("AGE"));
+                                
+                                JOptionPane.showMessageDialog(null, "Welcome! " + SignIn.cust.UserName ,"HI!",JOptionPane.INFORMATION_MESSAGE);
+                                Products.caller3();
+                            }else{
+                             SignIn.sell = new Seller(result.getString("USERNAME"), result.getString("FIRST_NAME"),
+                                        result.getString("LAST_NAME"),result.getString("AGE"))
+                                        ;
+                                
+                                JOptionPane.showMessageDialog(null, "Welcome! " + SignIn.cust.UserName ,"HI!",JOptionPane.INFORMATION_MESSAGE);
+                        }
+                        
+                    }
+                    
+                     if(rows == 0){
+                         JOptionPane.showMessageDialog(null, "Incorrect userName or password!","Try again!",JOptionPane.WARNING_MESSAGE);
+                     }
+
+            }catch(Exception err){
+                err.printStackTrace();
+            }finally{
+                try{
+                    result.close();
+                    
+                }catch(SQLException e2){
+                    System.out.println("result error");
+                   
+                }
+                 close();
+            }
+        }
+         
+         static void close(){
+            try{
+                  connect.close();
+            }catch(Exception err)   {
+                System.out.println("connection dose not want to close");
+            }
+        }
+         
+        public static String generateSHA256(String input) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(input.getBytes());
+            StringBuilder hexString = new StringBuilder();
+
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) {
+                    hexString.append('0');
+                }
+                hexString.append(hex);
+            }
+
+            return hexString.toString();
+        } catch (Exception e4) {
+            e4.printStackTrace();
+            return null;
+        }
+    }
+}
+
+public class SignIn extends javax.swing.JFrame {
+    public static Customer cust;
+    public static Seller sell;
+    
     /**
      * Creates new form SignIn
      */
@@ -194,7 +341,7 @@ public class SignIn extends javax.swing.JFrame {
     }//GEN-LAST:event_jTextField1ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
+        Lquery gitin = new Lquery(jTextField1.getText(), jTextField2.getText());
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed

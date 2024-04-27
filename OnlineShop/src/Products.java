@@ -250,6 +250,13 @@ public class Products extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
+    public static void caller3(){
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new Products().setVisible(true);
+            }
+        });
+    }
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">

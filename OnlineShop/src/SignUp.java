@@ -25,7 +25,7 @@ class Query{
         Query(){
              try{
             connect = DriverManager.getConnection(URL,USERNAME,PASSWORD);
-            inserta = connect.prepareStatement("insert into users(First_Name,Last_name,roles,userName,age,shipping_info,password)values(?,?,?,?,?,?,?)" );
+            inserta = connect.prepareStatement("insert into users(First_Name,Last_name,UROLE,userName,age,SHIPPING_INFO_NEW,PASSWORD_NEW)values(?,?,?,?,?,?,?)" );
             }catch(Exception e){
                 e.printStackTrace();
                 System.exit(1);
